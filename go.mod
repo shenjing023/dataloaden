@@ -1,9 +1,11 @@
-module github.com/vektah/dataloaden
+module github.com/shenjing023/dataloaden
+
+go 1.15
 
 require (
-	github.com/davecgh/go-spew v1.1.0 // indirect
-	github.com/pkg/errors v0.8.1
-	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/stretchr/testify v1.2.1
-	golang.org/x/tools v0.0.0-20190515012406-7d7faa4812bd
+	github.com/pkg/errors v0.9.1
+	github.com/spf13/cobra v1.1.3
+	github.com/stretchr/testify v1.7.0
+	golang.org/x/sys v0.0.0-20210309074719-68d13333faf2 // indirect
+	golang.org/x/tools v0.1.0
 )

@@ -95,3 +95,7 @@ func NewLoader(ctx context.Context) *UserLoader {
 ```
 
 If you feel like I'm wrong please raise an issue.
+#### Command Update
+```bash
+go run github.com/shenjing023/dataloaden generate -s UserLoader -k string -v *github.com/dataloaden/example.User -p dataloader
+```

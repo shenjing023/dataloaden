@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/vektah/dataloaden/example"
+	"github.com/shenjing023/dataloaden/example"
 )
 
 // UserSliceLoaderConfig captures the config to create a new UserSliceLoader

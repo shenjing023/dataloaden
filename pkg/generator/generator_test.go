@@ -1,9 +1,11 @@
 package generator
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	"golang.org/x/tools/go/packages"
 )
 
 func TestParseType(t *testing.T) {
@@ -23,4 +25,14 @@ func parse(s string) *goType {
 	}
 
 	return t
+}
+
+func ExamplePkgLoad() {
+	p, _ := packages.Load(&packages.Config{
+		Dir: "/home/liuwei/dataloader",
+	}, ".")
+
+	fmt.Println(p[0].Name)
+	// Output: sss
+	// aaaa
 }

@@ -78,8 +78,8 @@ func parseType(str string) (*goType, error) {
 	return t, nil
 }
 
-func Generate(name string, keyType string, valueType string, wd string) error {
-	data, err := getData(name, keyType, valueType, wd)
+func Generate(name string, keyType string, valueType string, pkgName string, wd string) error {
+	data, err := getData(name, keyType, valueType, pkgName, wd)
 	if err != nil {
 		return err
 	}
@@ -93,12 +93,15 @@ func Generate(name string, keyType string, valueType string, wd string) error {
 	return nil
 }
 
-func getData(name string, keyType string, valueType string, wd string) (templateData, error) {
+func getData(name string, keyType string, valueType string, pkgName string, wd string) (templateData, error) {
 	var data templateData
 
 	genPkg := getPackage(wd)
 	if genPkg == nil {
 		return templateData{}, fmt.Errorf("unable to find package info for " + wd)
+	}
+	if genPkg.Name == "" {
+		genPkg.Name = pkgName
 	}
 
 	var err error
@@ -135,6 +138,7 @@ func getPackage(dir string) *packages.Package {
 		return nil
 	}
 
+	fmt.Println(p)
 	return p[0]
 }
 
