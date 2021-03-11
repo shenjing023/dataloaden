@@ -138,7 +138,6 @@ func getPackage(dir string) *packages.Package {
 		return nil
 	}
 
-	fmt.Println(p)
 	return p[0]
 }
 

@@ -16,7 +16,7 @@ func main() {
 		pkg       string
 		dir       string
 		rootCmd   = &cobra.Command{
-			Use:   "dataloader",
+			Use:   "dataloaden",
 			Short: "Generate dataloader template file",
 		}
 		genCmd = &cobra.Command{
