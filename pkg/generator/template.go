@@ -114,7 +114,6 @@ func (l *{{.Name}}) LoadThunk(ctx context.Context, key {{.KeyType.String}}) func
 	}
 	batch := l.batch
 	pos := batch.keyIndex(ctx, l, key)
-	l.mu.Unlock()
 
 	return func() ({{.ValType.String}}, error) {
 		<-batch.done
