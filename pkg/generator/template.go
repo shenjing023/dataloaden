@@ -32,6 +32,11 @@ type {{.Name}}Config struct {
 	MaxBatch int
 }
 
+type cacheItem struct {
+	expire time.Time
+	value  {{.ValType.String}}
+}
+
 // New{{.Name}} creates a new {{.Name}} given a fetch, wait, and maxBatch
 func New{{.Name}}(config {{.Name}}Config) *{{.Name}} {
 	return &{{.Name}}{
@@ -55,7 +60,7 @@ type {{.Name}} struct {
 	// INTERNAL
 
 	// lazily created cache
-	cache map[{{.KeyType.String}}]{{.ValType.String}}
+	cache map[{{.KeyType.String}}]*cacheItem
 
 	// the current batch. keys will continue to be collected until timeout is hit,
 	// then everything will be sent to the fetch method and out to the listeners
@@ -63,6 +68,9 @@ type {{.Name}} struct {
 
 	// mutex to prevent races
 	mu sync.Mutex
+
+	// expiration time
+	expiration time.Duration
 }
 
 type {{.Name|lcFirst}}Batch struct {
@@ -83,12 +91,24 @@ func (l *{{.Name}}) Load(ctx context.Context, key {{.KeyType.String}}) ({{.ValTy
 // different data loaders without blocking until the thunk is called.
 func (l *{{.Name}}) LoadThunk(ctx context.Context, key {{.KeyType.String}}) func() ({{.ValType.String}}, error) {
 	l.mu.Lock()
+	defer l.mu.Unlock()
 	if it, ok := l.cache[key]; ok {
-		l.mu.Unlock()
-		return func() ({{.ValType.String}}, error) {
-			return it, nil
+		if l.expiration > 0 {
+			// had set expire
+			if time.Now().Before(it.expire) {
+				// not expire
+				return func() ({{.ValType.String}}, error) {
+					return it.value, nil
+				}
+			}
+			delete(l.cache, key)
+		} else {
+			return func() ({{.ValType.String}}, error) {
+				return it.value, nil
+			}
 		}
 	}
+
 	if l.batch == nil {
 		l.batch = &{{.Name|lcFirst}}Batch{done: make(chan struct{})}
 	}
@@ -192,9 +212,12 @@ func (l *{{.Name}}) Clear(key {{.KeyType}}) {
 
 func (l *{{.Name}}) unsafeSet(key {{.KeyType}}, value {{.ValType.String}}) {
 	if l.cache == nil {
-		l.cache = map[{{.KeyType}}]{{.ValType.String}}{}
+		l.cache = map[{{.KeyType}}]*cacheItem{}
 	}
-	l.cache[key] = value
+	l.cache[key] = &cacheItem{
+		expire: time.Now().Add(l.expiration),
+		value:  value,
+	}
 }
 
 // keyIndex will return the location of the key in the batch, if its not found
@@ -224,6 +247,7 @@ func (b *{{.Name|lcFirst}}Batch) keyIndex(ctx context.Context, l *{{.Name}}, key
 }
 
 func (b *{{.Name|lcFirst}}Batch) startTimer(ctx context.Context, l *{{.Name}}) {
+	// wait all goroutine append key to b.keys
 	time.Sleep(l.wait)
 	l.mu.Lock()
 
