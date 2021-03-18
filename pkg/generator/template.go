@@ -32,7 +32,7 @@ type {{.Name}}Config struct {
 	MaxBatch int
 }
 
-type cacheItem struct {
+type {{.Name}}CacheItem struct {
 	expire time.Time
 	value  {{.ValType.String}}
 }
@@ -60,7 +60,7 @@ type {{.Name}} struct {
 	// INTERNAL
 
 	// lazily created cache
-	cache map[{{.KeyType.String}}]*cacheItem
+	cache map[{{.KeyType.String}}]*{{.Name}}CacheItem
 
 	// the current batch. keys will continue to be collected until timeout is hit,
 	// then everything will be sent to the fetch method and out to the listeners
@@ -211,9 +211,9 @@ func (l *{{.Name}}) Clear(key {{.KeyType}}) {
 
 func (l *{{.Name}}) unsafeSet(key {{.KeyType}}, value {{.ValType.String}}) {
 	if l.cache == nil {
-		l.cache = map[{{.KeyType}}]*cacheItem{}
+		l.cache = map[{{.KeyType}}]*{{.Name}}CacheItem{}
 	}
-	l.cache[key] = &cacheItem{
+	l.cache[key] = &{{.Name}}CacheItem{
 		expire: time.Now().Add(l.expiration),
 		value:  value,
 	}
